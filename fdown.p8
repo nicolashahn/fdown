@@ -15,26 +15,36 @@ move_spd=2
 --how fast player falls
 fall_spd=2
 
+--how often to increase level
+level_frames=512
+
 function _init()
 
   mode="title"
   score=0
+  frame_ct=0
+  level=1
 
   --top left corner of player sprite
   p_x=screen_w/2
   p_y=screen_w/2-p_w-1
 
-  --how fast platforms rise
-  plat_spd=0.5
   --for keeping track of when to generate new platforms
   plat_frame_ctr=0
-  plat_frame_max=120
 
   --gap between platforms on a level
   gap_w=30
 
   platforms={}
   add_floor()
+end
+
+function plat_spd()
+  return 0.5+((level-1)*0.125)
+end
+
+function plat_frame_max()
+  return flr(screen_w/(level*0.75))
 end
 
 --returns platform's y coord if player has hit a platform else false
@@ -86,7 +96,7 @@ end
 
 function update_platforms()
   plat_frame_ctr+=1
-  if plat_frame_ctr==plat_frame_max then
+  if plat_frame_ctr%plat_frame_max()==0 then
     plat_frame_ctr=0
     add_floor()
   end
@@ -96,10 +106,16 @@ function update_platforms()
       del(platforms,p)
       floor_del=true
     end
-    p.y-=plat_spd
+    p.y-=0.5+plat_spd()
   end
   if floor_del then
     score += 1
+  end
+end
+
+function check_level_up()
+  if frame_ct%level_frames==0 then
+    level+=1
   end
 end
 
@@ -118,8 +134,10 @@ function _update60()
     end
   end
   if mode=="play" then
+    frame_ct+=1
     update_platforms()
     update_player()
+    check_level_up()
     check_gameover()
   end
   if mode=="gameover" then
