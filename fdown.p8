@@ -17,7 +17,8 @@ fall_spd=2
 
 function _init()
 
-  mode="play"
+  mode="title"
+  score=0
 
   --top left corner of player sprite
   p_x=screen_w/2
@@ -89,11 +90,16 @@ function update_platforms()
     plat_frame_ctr=0
     add_floor()
   end
+  floor_del=false
   for p in all(platforms) do
     if p.y+p.h<0 then
       del(platforms,p)
+      floor_del=true
     end
     p.y-=plat_spd
+  end
+  if floor_del then
+    score += 1
   end
 end
 
@@ -104,6 +110,13 @@ function check_gameover()
 end
 
 function _update60()
+  if mode=="title" then
+    for x=0,6 do
+      if btn(x) then
+          mode="play"
+      end
+    end
+  end
   if mode=="play" then
     update_platforms()
     update_player()
@@ -123,13 +136,27 @@ function draw_platforms()
   end
 end
 
+function draw_score()
+  print(score,2,2,7)
+end
+
+function draw_title()
+  cls()
+  print("fdown", 54,60,7)
+  print("press any button to start", 14,72,7)
+end
+
 function _draw()
+  if (mode=="title") then
+    draw_title()
+  end
   if mode=="play" then
     cls()
     draw_platforms()
     draw_player()
+    draw_score()
   end
-  if mode=="gameover" then
+  if (mode=="gameover") then
     print("game over",48,61,7)
   end
 end
