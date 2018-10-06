@@ -142,7 +142,7 @@ end
 function _update60()
   if mode=="title" then
     for x=0,6 do
-      if btn(x) then
+      if btnp(x) then
           mode="play"
       end
     end
@@ -155,8 +155,8 @@ function _update60()
     check_gameover()
   end
   if mode=="gameover" then
-      if btn(4) or btn(5) then
-          mode="title"
+      if btnp(4) or btnp(5) then
+        _init()
       end
   end
 end
